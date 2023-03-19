@@ -72,6 +72,17 @@ const nanoform = (initial) => {
     if (created)
       return created;
     const store = deepMap(getPath($form.get(), key));
+    store.onChange = (e) => {
+      const target = e.currentTarget;
+      if (!target)
+        return;
+      if (target.type === "date")
+        store.set(target.valueAsDate);
+      else if (target.type === "number")
+        store.set(target.valueAsNumber);
+      else
+        store.set(target.value);
+    };
     fields.set(key, store);
     const unsubField = onSet(store, ({ newValue }) => {
       $form.setKey(key, newValue);
