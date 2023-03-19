@@ -35,6 +35,23 @@ describe("basic tests", () => {
     expect(formEvents).toEqual([123, 321]);
     expect(eEvents).toEqual([123, 321, 321]);
   });
+
+  test("repeated subscriptions", () => {
+    const $form = createStore();
+
+    const formEvents: number[] = [];
+    $form.listen((v) => formEvents.push(v.c?.d.e!));
+
+    const e = $form.getField("c.d.e");
+    e.get();
+    e.get();
+    e.get();
+    e.get();
+    $form.setKey("c.d.e", 123);
+    e.get();
+    e.get();
+    expect(e.get()).toBe(123);
+  });
 });
 
 const noop = () => {};

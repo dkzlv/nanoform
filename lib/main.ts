@@ -2,9 +2,7 @@ import { listenKeys, onSet, onStart, onStop } from "nanostores";
 import { deepMap, DeepMapStore } from "./utils/deepMap";
 import { AllKeys, FromPath, getPath } from "./utils/path";
 
-export type FieldStore<T> = DeepMapStore<T> & {
-  onChange: (e: { currentTarget?: EventTarget | null }) => void;
-};
+export type FieldStore<T> = DeepMapStore<T>;
 export type FormStore<T> = DeepMapStore<T> & {
   getField: <K extends AllKeys<T>>(key: K) => FieldStore<FromPath<T, K>>;
 };
@@ -18,21 +16,16 @@ export const nanoform = <T extends Record<string, unknown>>(initial: T) => {
     if (created) return created;
 
     const store = deepMap(getPath($form.get(), key)) as FieldStore<any>;
-    store.onChange = (e) => {
-      const target = e.currentTarget as HTMLInputElement;
-      if (!target) return;
-
-      if (target.type === "date") store.set(target.valueAsDate);
-      else if (target.type === "number") store.set(target.valueAsNumber);
-      else store.set(target.value);
-    };
     fields.set(key, store);
 
-    const unsubField = onSet(store, ({ newValue }) => {
-      $form.setKey(key, newValue);
-    });
-    let unsub = () => {};
+    let unsub = () => {},
+      onsubField = () => {};
     onStart(store, () => {
+      store.set(getPath($form.get(), key));
+
+      onsubField = onSet(store, ({ newValue }) => {
+        $form.setKey(key, newValue);
+      });
       unsub = listenKeys($form as any, [key], (value) => {
         const newVal = getPath(value, key)!;
         if (newVal !== store.value) {
@@ -42,7 +35,7 @@ export const nanoform = <T extends Record<string, unknown>>(initial: T) => {
     });
     onStop(store, () => {
       unsub();
-      unsubField();
+      onsubField();
     });
 
     return store;

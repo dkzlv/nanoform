@@ -75,24 +75,15 @@
       if (created)
         return created;
       const store = deepMap(getPath($form.get(), key));
-      store.onChange = (e) => {
-        const target = e.currentTarget;
-        if (!target)
-          return;
-        if (target.type === "date")
-          store.set(target.valueAsDate);
-        else if (target.type === "number")
-          store.set(target.valueAsNumber);
-        else
-          store.set(target.value);
-      };
       fields.set(key, store);
-      const unsubField = nanostores.onSet(store, ({ newValue }) => {
-        $form.setKey(key, newValue);
-      });
       let unsub = () => {
+      }, onsubField = () => {
       };
       nanostores.onStart(store, () => {
+        store.set(getPath($form.get(), key));
+        onsubField = nanostores.onSet(store, ({ newValue }) => {
+          $form.setKey(key, newValue);
+        });
         unsub = nanostores.listenKeys($form, [key], (value) => {
           const newVal = getPath(value, key);
           if (newVal !== store.value) {
@@ -102,7 +93,7 @@
       });
       nanostores.onStop(store, () => {
         unsub();
-        unsubField();
+        onsubField();
       });
       return store;
     };
