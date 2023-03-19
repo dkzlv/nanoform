@@ -3,7 +3,7 @@ import { deepMap, DeepMapStore } from "./utils/deepMap";
 import { AllKeys, FromPath, getPath } from "./utils/path";
 
 export type FieldStore<T> = DeepMapStore<T> & {
-  onChange: (e: Event) => void;
+  onChange: (e: { currentTarget?: EventTarget | null }) => void;
 };
 export type FormStore<T> = DeepMapStore<T> & {
   getField: <K extends AllKeys<T>>(key: K) => FieldStore<FromPath<T, K>>;
