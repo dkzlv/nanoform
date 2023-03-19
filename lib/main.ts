@@ -2,8 +2,9 @@ import { listenKeys, onSet, onStart, onStop } from "nanostores";
 import { deepMap, DeepMapStore } from "./utils/deepMap";
 import { AllKeys, FromPath, getPath } from "./utils/path";
 
-type FormStore<T> = DeepMapStore<T> & {
-  getField: <K extends AllKeys<T>>(key: K) => DeepMapStore<FromPath<T, K>>;
+export type FieldStore<T> = DeepMapStore<T>;
+export type FormStore<T> = DeepMapStore<T> & {
+  getField: <K extends AllKeys<T>>(key: K) => FieldStore<FromPath<T, K>>;
 };
 
 export const nanoform = <T extends Record<string, unknown>>(initial: T) => {
