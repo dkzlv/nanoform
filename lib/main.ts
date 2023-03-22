@@ -45,4 +45,5 @@ export const nanoform = <T extends Record<string, unknown>>(initial: T) => {
 };
 
 export { setPath, getPath } from "./utils/path";
+export type { AllKeys, FromPath } from "./utils/path";
 export { deepMap } from "./utils/deepMap";

@@ -6,4 +6,5 @@ export declare type FormStore<T> = DeepMapStore<T> & {
 };
 export declare const nanoform: <T extends Record<string, unknown>>(initial: T) => FormStore<T>;
 export { setPath, getPath } from "./utils/path";
+export type { AllKeys, FromPath } from "./utils/path";
 export { deepMap } from "./utils/deepMap";
