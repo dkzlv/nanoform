@@ -4,6 +4,8 @@ const createStore = () =>
   nanoform<{
     a: { b: string }[];
     c?: { d: { e: number } };
+    g?: string;
+    h?: string;
   }>({
     a: [],
   });
@@ -33,7 +35,7 @@ describe("basic tests", () => {
     expect(e.get()).toBe(321);
 
     expect(formEvents).toEqual([123, 321]);
-    expect(eEvents).toEqual([123, 321, 321]);
+    expect(eEvents).toEqual([123, 321]);
   });
 
   test("repeated subscriptions", () => {
@@ -52,6 +54,51 @@ describe("basic tests", () => {
     e.get();
     expect(e.get()).toBe(123);
   });
-});
 
-const noop = () => {};
+  test("it only fires when a related field or the whole form changed", () => {
+    const $form = createStore();
+
+    const form: { h?: string; g?: string }[] = [];
+    $form.listen((v) => form.push({ h: v.h, g: v.g }));
+
+    const $h = $form.getField("h");
+    const h: (string | undefined)[] = [];
+    $h.listen((v) => h.push(v));
+
+    const $g = $form.getField("g");
+    const g: (string | undefined)[] = [];
+    $g.listen((v) => g.push(v));
+
+    $g.set("1");
+    expect(g).toEqual(["1"]);
+    expect(form).toEqual([{ g: "1", h: void 0 }]);
+    expect(h).toEqual([]);
+
+    $h.set("2");
+    expect(h).toEqual(["2"]);
+    expect(form).toEqual([
+      { g: "1", h: void 0 },
+      { g: "1", h: "2" },
+    ]);
+    expect(g).toEqual(["1"]);
+
+    $form.setKey("g", "3");
+    expect(h).toEqual(["2"]);
+    expect(form).toEqual([
+      { g: "1", h: void 0 },
+      { g: "1", h: "2" },
+      { g: "3", h: "2" },
+    ]);
+    expect(g).toEqual(["1", "3"]);
+
+    $form.set({ a: [] });
+    expect(h).toEqual(["2", void 0]);
+    expect(form).toEqual([
+      { g: "1", h: void 0 },
+      { g: "1", h: "2" },
+      { g: "3", h: "2" },
+      { g: void 0, h: void 0 },
+    ]);
+    expect(g).toEqual(["1", "3", void 0]);
+  });
+});

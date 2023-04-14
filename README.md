@@ -5,7 +5,7 @@
 
 A tiny form library for [Nano Stores](https://github.com/nanostores/nanostores).
 
-- **Small**. 730 bytes (minified and gzipped).
+- **Small**. 350 bytes.
 - **Phenomenal performance**. Only rerenders those fields that got updates.
 - **Nano Stores first**. Finally, have your form logic *outside* of components. 
 Plays nicely with [store events](https://github.com/nanostores/nanostores#store-events),

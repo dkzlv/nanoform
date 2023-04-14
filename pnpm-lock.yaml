@@ -3,20 +3,16 @@ lockfileVersion: 5.4
 specifiers:
   '@evilmartians/lefthook': ^1.2.6
   '@rollup/plugin-strip': ^3.0.2
-  hotscript: ^1.0.10
-  nanostores: ^0.7.1
+  nanostores: ^0.8
   typescript: ^4.9.4
   vite: ^3.0.4
   vite-plugin-dts: ^1.7.1
   vitest: ^0.26.2
 
-dependencies:
-  hotscript: 1.0.10
-
 devDependencies:
   '@evilmartians/lefthook': 1.2.6
   '@rollup/plugin-strip': 3.0.2
-  nanostores: 0.7.1
+  nanostores: 0.8.0
   typescript: 4.9.4
   vite: 3.0.4
   vite-plugin-dts: 1.7.1_vite@3.0.4
@@ -597,10 +593,6 @@ packages:
       function-bind: 1.1.1
     dev: true
 
-  /hotscript/1.0.10:
-    resolution: {integrity: sha512-eDbtzWfe3LN1Zd9NYoNjogmnqd/LiAo1lKztARnEzzsRy5QKW+VJ7TCWzsDwbSuq79KZ0yVoelQD+GPW83O21w==}
-    dev: false
-
   /import-lazy/4.0.0:
     resolution: {integrity: sha512-rKtvo6a868b5Hu3heneU+L4yEQ4jYKLtjpnPeUdK7h0yzXGmyBTypknlkCvHFBqfX9YlorEiMM6Dnq/5atfHkw==}
     engines: {node: '>=8'}
@@ -741,9 +733,9 @@ packages:
     hasBin: true
     dev: true
 
-  /nanostores/0.7.1:
-    resolution: {integrity: sha512-7HenoVpZOjRudHCmAVWKloBTk3+Ozw49KuRWq/pNlEIIVS3x9dID+I5z3Rhjxl1muhHwv4dFhpT+0FebT9jvaA==}
-    engines: {node: ^14.0.0 || ^16.0.0 || >=18.0.0}
+  /nanostores/0.8.0:
+    resolution: {integrity: sha512-Xgs3qwYhNYXyglDe41JEtACDvFZELFRofDBqBuJ02JG1mrwXWneQTsk89GHvW0bgLPcWXOz4GRm4enwgjnD8FQ==}
+    engines: {node: ^16.0.0 || >=18.0.0}
     dev: true
 
   /path-browserify/1.0.1:
