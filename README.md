@@ -63,7 +63,7 @@ it's fine, but let's assume it's not good in our case.
 `email2` equality.
 
 Let's use the `$authForm.getField` helper, that gets the object path to the field
-and returns a stable and store for this field. The store is just an `atom`, nothing
+and returns a stable store for this field. The store is just an `atom`, nothing
 fancy. It means you can use all the foundational blocks of Nano Stores with them.
 
 ```ts
