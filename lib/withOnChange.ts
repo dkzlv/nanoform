@@ -1,8 +1,14 @@
-export function withOnChange(store: any): any {
+import { WritableAtom } from "nanostores";
+import { FormStoreWithOnChange } from "./types";
+
+export function withOnChange<T>(
+  store: WritableAtom<T> & { getField: (...args: any[]) => any }
+): FormStoreWithOnChange<T> {
   const orig = store.getField;
-  store.getField = (key: string) => {
+  store.getField = (key) => {
     const field = orig(key);
-    field.onChange = (e: any) => {
+    type Return = typeof field & { onChange: (e?: any) => void };
+    (field as Return).onChange = (e: any) => {
       const target = e?.currentTarget;
       if (!target) return;
 
@@ -27,7 +33,7 @@ export function withOnChange(store: any): any {
       }
       field.set(value);
     };
-    return field;
+    return field as Return;
   };
   return store;
 }

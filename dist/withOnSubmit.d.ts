@@ -1,1 +1,4 @@
-export declare function withOnSubmit(store: any, callback: (formData: any, e?: any) => Promise<any>): any;
+import { StoreValue, WritableAtom } from "nanostores";
+export declare function withOnSubmit<T extends WritableAtom>(store: T, callback: (formData: StoreValue<T>, e?: any) => Promise<any>): T & {
+    onSubmit: (e?: any) => Promise<void>;
+};
