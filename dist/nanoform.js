@@ -34,6 +34,50 @@ const nanoform = (initial) => {
   };
   return $form;
 };
+function withOnChange(store) {
+  const orig = store.getField;
+  store.getField = (key) => {
+    const field = orig(key);
+    field.onChange = (e) => {
+      const target = e == null ? void 0 : e.currentTarget;
+      if (!target)
+        return;
+      let value;
+      switch (target.type) {
+        case "date":
+        case "month":
+        case "week":
+          value = target.valueAsDate;
+          break;
+        case "number":
+        case "range":
+          value = target.valueAsNumber;
+          break;
+        case "checkbox":
+          value = target.checked;
+          break;
+        default:
+          value = target.value;
+      }
+      field.set(value);
+    };
+    return field;
+  };
+  return store;
+}
+function withOnSubmit(store, callback) {
+  let submitting = false;
+  store.onSubmit = async (e) => {
+    e.preventDefault();
+    if (submitting)
+      return;
+    submitting = true;
+    callback(store.value, e).finally(() => submitting = false);
+  };
+  return store;
+}
 export {
-  nanoform
+  nanoform,
+  withOnChange,
+  withOnSubmit
 };

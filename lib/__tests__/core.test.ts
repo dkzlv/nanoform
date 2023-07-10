@@ -1,4 +1,4 @@
-import { nanoform } from "../main";
+import { nanoform } from "../core";
 
 const createStore = () =>
   nanoform<{
