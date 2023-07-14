@@ -1,5 +1,5 @@
 import { nanoform } from "../core";
-import { withOnChange } from "../withOnChange";
+import { formatDate, withOnChange } from "../withOnChange";
 import { render, fireEvent, screen } from "@testing-library/react";
 
 test("handles non-empty events", () => {
@@ -47,4 +47,14 @@ test("handles non-empty events", () => {
     checkbox: true,
     date: new Date("2022-01-01"),
   });
+});
+
+test("formats date", () => {
+  expect(formatDate(new Date(Date.UTC(2020, 0, 1, 12, 0, 0, 0)))).toBe(
+    "2020-01-01"
+  );
+  expect(formatDate(new Date(Date.UTC(2020, 10, 10, 12, 0, 0, 0)))).toBe(
+    "2020-11-10"
+  );
+  expect(formatDate()).toBe("");
 });

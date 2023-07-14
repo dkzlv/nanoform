@@ -8,7 +8,6 @@ test("handles submit event", async () => {
 
   const mutateFn = vi.fn().mockImplementation(delay);
   const $mutate = createMutation<unknown>(mutateFn);
-  $mutate.listen(() => {});
 
   const initialValue = {
     text: "",
@@ -17,7 +16,7 @@ test("handles submit event", async () => {
     date: new Date("2020-01-01"),
   };
 
-  const form = withOnSubmit(nanoform(initialValue), $mutate.get().mutate);
+  const form = withOnSubmit(nanoform(initialValue), $mutate.mutate);
   form.subscribe(() => {});
 
   const toRender = (
@@ -39,6 +38,13 @@ test("handles submit event", async () => {
 
   await delay(200);
   expect($mutate.get().loading).toBe(false);
+});
+
+test("handles sync callback", async () => {
+  const mutateFn = vi.fn();
+  const form = withOnSubmit(nanoform({}), mutateFn);
+  form.subscribe(() => {});
+  form.onSubmit();
 });
 
 const delay = (ms = 100) => new Promise((r) => setTimeout(r, ms));

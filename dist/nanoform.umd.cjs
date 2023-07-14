@@ -43,7 +43,7 @@
       const field = orig(key);
       field.onChange = (e) => {
         const target = e == null ? void 0 : e.currentTarget;
-        if (!target)
+        if (!target || !("value" in target))
           return;
         let value;
         switch (target.type) {
@@ -68,17 +68,28 @@
     };
     return store;
   }
+  function formatDate(d) {
+    if (!d)
+      return "";
+    const month = ("" + (d.getMonth() + 1)).padStart(2, "0"), day = ("" + d.getDate()).padStart(2, "0"), year = d.getFullYear();
+    return [year, month, day].join("-");
+  }
   function withOnSubmit(store, callback) {
     let submitting = false;
     store.onSubmit = async (e) => {
-      e.preventDefault();
+      e == null ? void 0 : e.preventDefault();
       if (submitting)
         return;
       submitting = true;
-      callback(store.value, e).finally(() => submitting = false);
+      try {
+        await callback(store.value, e);
+      } finally {
+        submitting = false;
+      }
     };
     return store;
   }
+  exports2.formatDate = formatDate;
   exports2.nanoform = nanoform;
   exports2.withOnChange = withOnChange;
   exports2.withOnSubmit = withOnSubmit;

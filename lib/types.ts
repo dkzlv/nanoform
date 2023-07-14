@@ -13,10 +13,10 @@ export type FormStore<T extends BaseDeepMap> = DeepMapStore<T> & {
   getField: <K extends AllPaths<T>>(key: K) => FieldStore<T, K>;
 };
 
-export type FormStoreWithOnChange<T> = WritableAtom<T> & {
-  getField: <K extends AllPaths<T>>(
-    key: K
-  ) => FieldStore<T, K> & {
-    onChange: (e: any) => void;
-  };
+type OnChange = {
+  onChange: (e: { currentTarget: unknown }) => void;
 };
+export type FormStoreWithOnChange<T> = WritableAtom<T> & {
+  getField: <K extends AllPaths<T>>(key: K) => FieldStore<T, K> & OnChange;
+};
+export type FieldStoreWithOnChange = WritableAtom<any> & OnChange;
