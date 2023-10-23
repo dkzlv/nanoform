@@ -1,6 +1,5 @@
-import { nanoform } from "../core";
+import { nanoform } from "../main";
 import { render, fireEvent, screen } from "@testing-library/react";
-import { withOnSubmit } from "../withOnSubmit";
 import { nanoquery } from "@nanostores/query";
 
 test("handles submit event", async () => {
@@ -16,7 +15,7 @@ test("handles submit event", async () => {
     date: new Date("2020-01-01"),
   };
 
-  const form = withOnSubmit(nanoform(initialValue), $mutate.mutate);
+  const form = nanoform(initialValue, $mutate.mutate);
   form.subscribe(() => {});
 
   const toRender = (
@@ -42,7 +41,7 @@ test("handles submit event", async () => {
 
 test("handles sync callback", async () => {
   const mutateFn = vi.fn();
-  const form = withOnSubmit(nanoform({}), mutateFn);
+  const form = nanoform({}, mutateFn);
   form.subscribe(() => {});
   form.onSubmit();
 });

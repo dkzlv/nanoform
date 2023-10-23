@@ -1,16 +1,13 @@
-import { nanoform } from "../core";
-import { formatDate, withOnChange } from "../withOnChange";
+import { nanoform, formatDate } from "../main";
 import { render, fireEvent, screen } from "@testing-library/react";
 
 test("handles non-empty events", () => {
-  const form = withOnChange(
-    nanoform({
-      text: "",
-      number: 0,
-      checkbox: false,
-      date: new Date("2020-01-01"),
-    })
-  );
+  const form = nanoform({
+    text: "",
+    number: 0,
+    checkbox: false,
+    date: new Date("2020-01-01"),
+  });
   form.subscribe(() => {});
   const text = form.getField("text"),
     number = form.getField("number"),

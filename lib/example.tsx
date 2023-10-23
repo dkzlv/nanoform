@@ -1,15 +1,20 @@
 import { nanoquery } from "@nanostores/query";
-import { nanoform, withOnChange, formatDate, withOnSubmit } from "./main";
-import { FieldStoreWithOnChange } from "./types";
+import { nanoform, formatDate } from "./main";
 import { useStore } from "@nanostores/react";
+import { FieldStore } from "./types";
 
 const [, createMutationStore] = nanoquery();
 
+type Form = {
+  str?: string;
+  dt?: Date;
+  num?: number;
+  agreed?: boolean;
+};
+
 // WITH ON CHANGE
 {
-  const $form = withOnChange(
-    nanoform<{ str?: string; dt?: Date; num?: number; agreed?: boolean }>({})
-  );
+  const $form = nanoform<Form>({});
 
   const App = () => {
     return (
@@ -22,12 +27,11 @@ const [, createMutationStore] = nanoquery();
     );
   };
 }
-
 const Input = ({
   $field,
   type,
 }: {
-  $field: FieldStoreWithOnChange;
+  $field: FieldStore<Form, any>;
   type: JSX.IntrinsicElements["input"]["type"];
 }) => {
   const value = useStore($field);
@@ -48,10 +52,7 @@ const Input = ({
     // I'll leave this to reader's imagination
   });
 
-  const $form = withOnSubmit(
-    withOnChange(nanoform<AuthData>({})),
-    $signup.mutate
-  );
+  const $form = nanoform<AuthData>({}, $signup.get().mutate);
 
   const Signup = () => {
     const { loading, error } = useStore($signup);

@@ -6,17 +6,12 @@ import type {
   WritableAtom,
 } from "nanostores";
 
-export type FieldStore<T, K> = FromPath<T, K> extends BaseDeepMap
+export type FieldStore<T, K> = (FromPath<T, K> extends BaseDeepMap
   ? DeepMapStore<FromPath<T, K>>
-  : WritableAtom<FromPath<T, K>>;
-export type FormStore<T extends BaseDeepMap> = DeepMapStore<T> & {
-  getField: <K extends AllPaths<T>>(key: K) => FieldStore<T, K>;
-};
-
-type OnChange = {
+  : WritableAtom<FromPath<T, K>>) & {
   onChange: (e: { currentTarget: unknown }) => void;
 };
-export type FormStoreWithOnChange<T> = WritableAtom<T> & {
-  getField: <K extends AllPaths<T>>(key: K) => FieldStore<T, K> & OnChange;
+export type FormStore<T extends BaseDeepMap> = DeepMapStore<T> & {
+  getField: <K extends AllPaths<T>>(key: K) => FieldStore<T, K>;
+  onSubmit: (e?: any) => void;
 };
-export type FieldStoreWithOnChange = WritableAtom<any> & OnChange;
