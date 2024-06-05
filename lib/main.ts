@@ -18,6 +18,8 @@ export const nanoform = <T extends BaseDeepMap>(
 ): FormStore<T> => {
   const fields = new Map<AllPaths<T>, any>();
 
+  const initialClone = structuredClone(initial);
+
   const $form = deepMap(initial) as any;
   $form.getField = (key: AllPaths<T>) => {
     const created = fields.get(key);
@@ -49,6 +51,7 @@ export const nanoform = <T extends BaseDeepMap>(
       }
       $field.set(value);
     };
+    $field.reset = () => $field.set(getPath(initialClone as any, key));
     fields.set(key, $field);
 
     let unsub = () => {},
@@ -91,10 +94,16 @@ export const nanoform = <T extends BaseDeepMap>(
     submitting = true;
     try {
       await onSubmit?.($form.value);
+      // Resetting after successful submission. Is that the way to go?
+      $form.reset();
     } finally {
       submitting = false;
     }
   };
+
+  $form.reset = () => $form.set(initialClone);
+  // Cleaning up module-level forms
+  onStop($form, $form.reset);
 
   return $form;
 };

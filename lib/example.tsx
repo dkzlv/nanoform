@@ -63,7 +63,7 @@ const Input = ({
         <Input type="date" $field={$form.getField("password")} />
         <Input type="checkbox" $field={$form.getField("agreed")} />
 
-        <button disabled={loading}>Sign up</button>
+        <button aria-disabled={loading}>Sign up</button>
         {error && <p>Something terrible happened</p>}
       </form>
     );

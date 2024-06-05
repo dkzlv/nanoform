@@ -1,6 +1,7 @@
 import { deepMap, getPath, onStart, onSet, listenKeys, onStop } from "nanostores";
 const nanoform = (initial, onSubmit) => {
   const fields = /* @__PURE__ */ new Map();
+  const initialClone = structuredClone(initial);
   const $form = deepMap(initial);
   $form.getField = (key) => {
     const created = fields.get(key);
@@ -30,6 +31,7 @@ const nanoform = (initial, onSubmit) => {
       }
       $field.set(value);
     };
+    $field.reset = () => $field.set(getPath(initialClone, key));
     fields.set(key, $field);
     let unsub = () => {
     }, onsubField = () => {
@@ -63,10 +65,13 @@ const nanoform = (initial, onSubmit) => {
     submitting = true;
     try {
       await (onSubmit == null ? void 0 : onSubmit($form.value));
+      $form.reset();
     } finally {
       submitting = false;
     }
   };
+  $form.reset = () => $form.set(initialClone);
+  onStop($form, $form.reset);
   return $form;
 };
 function formatDate(d) {

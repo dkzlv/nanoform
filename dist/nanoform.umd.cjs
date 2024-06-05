@@ -4,6 +4,7 @@
   "use strict";
   const nanoform = (initial, onSubmit) => {
     const fields = /* @__PURE__ */ new Map();
+    const initialClone = structuredClone(initial);
     const $form = nanostores.deepMap(initial);
     $form.getField = (key) => {
       const created = fields.get(key);
@@ -33,6 +34,7 @@
         }
         $field.set(value);
       };
+      $field.reset = () => $field.set(nanostores.getPath(initialClone, key));
       fields.set(key, $field);
       let unsub = () => {
       }, onsubField = () => {
@@ -66,10 +68,13 @@
       submitting = true;
       try {
         await (onSubmit == null ? void 0 : onSubmit($form.value));
+        $form.reset();
       } finally {
         submitting = false;
       }
     };
+    $form.reset = () => $form.set(initialClone);
+    nanostores.onStop($form, $form.reset);
     return $form;
   };
   function formatDate(d) {

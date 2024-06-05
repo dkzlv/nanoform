@@ -30,9 +30,9 @@ npm install nanostores @nanostores/form
 
 See [Nano Stores docs](https://github.com/nanostores/nanostores#guide) about using the store and subscribing to store’s changes in UI frameworks.
 
-Nanoform provides you with a couple of helpers. Let's go one by one.
+Nanoform gives you a couple of helpers. Let's go one by one.
 
-### `nanoform` and `$form.getField`
+### `nanoform` that returns `FormStore`
 
 The core is the form store and its initial shape. `nanoform` returns a [`deepMap`](https://github.com/nanostores/nanostores#deep-maps) from the Nano Stores standard exports.
 
@@ -61,16 +61,21 @@ Here you go. You can already use this store in the UI. But it has a few issues:
 1. it will rerender the whole form like crazy on each keystroke! Sometimes it's fine, but most of the time it's not.
 2. also, it'd be good to have some decent validation of the `email1` and `email2` equality.
 
+We'll tackle them one by one.
+
+## `FormStore.getField` that returns `FieldStore`
+
 Here comes the core helper: `.getField`. It's a strictly typed function which gets the object path to the field and returns a _stable_ store for this field. Stable means that it won't change its identity if you call this function many times with the same key.
 
 The return is just another `deepMap`, so it works with everything Nano Stores provides you with (lifecycles, `computed`, etc.).
 
-The most magical part is that its value is synced with the parent form, so whenever any of them changes, the other changes as well.
+The most magical part is that its value is in two-way sync with the parent form, so whenever any of them changes, the other changes as well.
 
 Let's add a simple check if emails are the same.
 
 ```tsx
 import { computed } from 'nanostores';
+import { useStore } from '@nanostores/react';
 
 // Will only recalc when these two fields change
 // You can use the same approach to run schema validation on the whole form data
@@ -80,7 +85,7 @@ const $emailsAreSame = computed(
   (email1, email2) => email1 === email2
 );
 
-  // Will only rerender when this field is touched
+// Will only rerender when this field is touched
 const Email1 = () => {
   const $field = $authForm.getField("email1");
   return (
@@ -93,17 +98,47 @@ const Email1 = () => {
 };
 ```
 
-### `withOnChange`
+## `FormStore.onSubmit`
+
+When you create a form store, you can provide a second optional argument for the form submission method.
+
+```tsx
+import { nanoform } from '@nanostores/form';
+import { useStore } from '@nanostores/react';
+
+export const $simpleForm = nanoform<{field1?: string}>(
+  {},
+  async (data) => {
+    // sending data somewhere, validation, etc.
+  }
+);
+
+const Form = () => {
+  return (
+    <form onSubmit={$simpleForm.onSubmit}>
+      ...
+    </form>
+  );
+};
+```
+
+It's essentially a small quality-of-life improvement. It:
+
+1. no double submissions can happen (we await for the submit function to resolve);
+2. we call `preventDefault`;
+3. we reset form's value to initial upon successful submission.
+
+## `FieldStore.onChange`
+
+All of the `FieldStore` instances have a `onChange` function on them. 
 
 This is the second most important helper. Just wrap your form with this function to get a stable identity `onChange` callback added to your fields:
 
 ```tsx
-import { nanoform, withOnChange, formatDate, FieldStoreWithOnChange } from "@nanostores/form";
+import { nanoform, formatDate, type FieldStore } from "@nanostores/form";
 import { useStore } from "@nanostores/react";
 
-const $form = withOnChange(
-  nanoform<{ str?: string; dt?: Date; num?: number; agreed?: boolean }>({})
-);
+const $form = nanoform<{ str?: string; dt?: Date; num?: number; agreed?: boolean }>({});
 
 const App = () => {
   return (
@@ -120,7 +155,7 @@ const Input = ({
   $field,
   type,
 }: {
-  $field: FieldStoreWithOnChange;
+  $field: FieldStore;
   type: JSX.IntrinsicElements["input"]["type"];
 }) => {
   const value = useStore($field);
@@ -136,11 +171,17 @@ const Input = ({
 
 The neat thing is that it will use `value`, `valueAsNumber`, `valueAsDate` and `checked` based on the type this input has. So you'll get the value casted to the correct type completely automatically by the browser.
 
-### `withOnSubmit`
+## `FormStore.reset` and `FieldStore.reset`
 
-What form goes without a `<form>`, am I right?
+When creating the form, we make a `structuredClone` of the initial provided value.
 
-This helper is very simple. It adds a stable `onSubmit` to your form store that prevents the default action, makes sure you can't submit the form multiple times, and executes the provided callback with store's data and event (just in case). It plays really nice with [`@nanostores/query` mutations](https://github.com/nanostores/query#createmutatorstore):
+Call `form.reset()` to reset the form to its initial value, call `field.reset()` to reset this specific field.
+
+## Recipes
+
+### Usage with `@nanostores/query`
+
+Form submission plays really nice with [`@nanostores/query` mutations](https://github.com/nanostores/query#createmutatorstore). Just provide the `mutate` function directly to the form call.
 
 ```tsx
 type AuthData = { email?: string; password?: string; agreed?: boolean };
@@ -149,10 +190,7 @@ const $signup = createMutationStore<AuthData>(async ({ data }) => {
   // I'll leave this to reader's imagination
 });
 
-const $form = withOnSubmit(
-  withOnChange(nanoform<AuthData>({})),
-  $signup.mutate
-);
+const $form = nanoform<AuthData>({}, $signup.mutate);
 
 const Signup = () => {
   const { loading, error } = useStore($signup);
